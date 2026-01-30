@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7xin™ 网址导航</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #2c3e50 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .logo span {
+            color: #ffcc00;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        /* 内容区域 */
+        .content {
+            padding: 25px;
+        }
+        
+        /* 链接卡片 */
+        .link-card {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4a6fa5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74,111,165,0.1);
+        }
+        
+        .link-card.fastest {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+        
+        .link-info {
+            flex: 1;
+        }
+        
+        .link-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .link-desc {
+            font-size: 0.95rem;
+            color: #666;
+        }
+        
+        .link-url {
+            font-size: 0.85rem;
+            color: #4a6fa5;
+            margin-top: 5px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        
+        /* 按钮区域 */
+        .buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .speed-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+        
+        .speed-btn:hover {
+            background: #5a6268;
+        }
+        
+        .speed-btn.testing {
+            background: #17a2b8;
+            cursor: wait;
+        }
+        
+        .go-btn {
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+        
+        .go-btn:hover {
+            background: #3a5a8a;
+        }
+        
+        /* 测速结果显示 */
+        .speed-result {
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 4px;
+            min-width: 70px;
+            text-align: center;
+            display: none;
+        }
+        
+        .speed-result.show {
+            display: block;
+        }
+        
+        /* 速度标签 */
+        .speed-tag {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        
+        .speed-tag.fast {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .speed-tag.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .speed-tag.slow {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* 颜色定义 */
+        .speed-fast { /* 快 */
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .speed-medium { /* 中 */
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .speed-slow { /* 慢 */
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .speed-timeout { /* 超时 */
+            background: #343a40;
+            color: white;
+            border: 1px solid #23272b;
+        }
+        
+        /* 一键测速按钮区域【暂时关闭，启用时请修改注释】【共三处需要调整/第1】 */
+/*        .batch-test-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #dee2e6;
+            text-align: center;
+        }
+        
+        .test-all-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .test-all-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+        }
+        
+        .test-all-btn.testing {
+            background: #17a2b8;
+            cursor: wait;
+        }
+        
+        .test-all-btn .btn-text {
+            margin-left: 8px;
+        }
+*/        
+        /* 底部 */
+        .footer {
+            background: #f1f5f9;
+            padding: 15px 25px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 95%;
+            }
+            
+            .link-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .link-info {
+                margin-bottom: 15px;
+                width: 100%;
+            }
+            
+            .buttons {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .test-all-btn {
+                width: 100%;
+                padding: 12px 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .speed-btn, .go-btn {
+                padding: 8px 12px;
+            }
+            
+            .test-all-btn {
+                font-size: 0.95rem;
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">7xin<span>™</span> 网址导航</div>
+            <div class="subtitle">快速单页导航，定制首页</div>
+        </div>
+        
+        <div class="content">
+            <!-- 卡片1 -->
+            <div class="link-card">
+                <div class="link-info">
+                    <div class="link-title">7xin™ 首页导航</div>
+                    <div class="link-desc">快速单页导航，定制首页，快速访问您最常用的网站</div>
+                    <div class="link-url">http://home.7xin.com</div>
+                </div>
+                <div class="buttons">
+                    <button class="speed-btn" data-url="http://home.7xin.com">
+                        <i class="fas fa-tachometer-alt"></i>测速
+                    </button>
+                    <div class="speed-result"></div>
+                    <a href="http://home.7xin.com" class="go-btn" target="_blank">
+                        访问 <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 卡片2 -->
+            <div class="link-card">
+                <div class="link-info">
+                    <div class="link-title">7xin™ Go导航</div>
+                    <div class="link-desc">各类实用网址导航，分类整理，快速找到您需要的网站</div>
+                    <div class="link-url">http://nav.7xin.com</div>
+                </div>
+                <div class="buttons">
+                    <button class="speed-btn" data-url="http://nav.7xin.com">
+                        <i class="fas fa-tachometer-alt"></i>测速
+                    </button>
+                    <div class="speed-result"></div>
+                    <a href="http://nav.7xin.com" class="go-btn" target="_blank">
+                        访问 <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 卡片3 -->
+            <div class="link-card">
+                <div class="link-info">
+                    <div class="link-title">7xin™ Go下载</div>
+                    <div class="link-desc">经典的实用软件下载，安全可靠，绿色无广告</div>
+                    <div class="link-url">http://download.7xin.com</div>
+                </div>
+                <div class="buttons">
+                    <button class="speed-btn" data-url="http://download.7xin.com">
+                        <i class="fas fa-tachometer-alt"></i>测速
+                    </button>
+                    <div class="speed-result"></div>
+                    <a href="http://download.7xin.com" class="go-btn" target="_blank">
+                        访问 <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 卡片4 -->
+            <div class="link-card">
+                <div class="link-info">
+                    <div class="link-title">7xin™ 首页导航【备用】</div>
+                    <div class="link-desc">快速单页导航，定制首页【备用域名】，主域名不可用时使用</div>
+                    <div class="link-url">http://backup.7xin.com</div>
+                </div>
+                <div class="buttons">
+                    <button class="speed-btn" data-url="http://backup.7xin.com">
+                        <i class="fas fa-tachometer-alt"></i>测速
+                    </button>
+                    <div class="speed-result"></div>
+                    <a href="http://backup.7xin.com" class="go-btn" target="_blank">
+                        访问 <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 一键测速按钮区域（放在卡片列表之后）【暂时关闭，启用时请修改注释】【共三处需要调整/第2】 -->
+<!--            <div class="batch-test-section">
+                <button class="test-all-btn">
+                    <i class="fas fa-bolt"></i>
+                    <span class="btn-text">一键测速所有</span>
+                </button>
+            </div>
+-->        </div>
+        
+        <div class="footer">
+            <p>© 2023 7xin™ 网址导航 | 点击"测速"比较各链接的相对速度</p>
+            <p style="font-size:0.8rem; margin-top:5px; color:#666;">
+                测速结果基于HTTP连接时间，用于相对比较参考
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const speedButtons = document.querySelectorAll('.speed-btn');
+            const testAllBtn = document.querySelector('.test-all-btn');
+            let fastestCard = null;
+            let fastestTime = Infinity;
+            
+            // 一键测速所有功能【暂时关闭，启用时请修改注释】【共三处需要调整/第3】
+/*            testAllBtn.addEventListener('click', function() {
+                if (this.classList.contains('testing')) return;
+                
+                this.classList.add('testing');
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 测速中...';
+                
+                // 重置最快记录
+                fastestCard = null;
+                fastestTime = Infinity;
+                
+                // 移除所有现有标记
+                document.querySelectorAll('.link-card').forEach(card => {
+                    card.classList.remove('fastest');
+                    const title = card.querySelector('.link-title');
+                    if (title.querySelector('.speed-tag')) {
+                        title.querySelector('.speed-tag').remove();
+                    }
+                });
+                
+                // 点击所有测速按钮
+                speedButtons.forEach(btn => btn.click());
+                
+                // 4秒后恢复按钮状态
+                setTimeout(() => {
+                    this.classList.remove('testing');
+                    this.innerHTML = '<i class="fas fa-bolt"></i><span class="btn-text">一键测速所有</span>';
+                }, 4000);
+            });
+*/            
+            // 单个测速按钮功能
+            speedButtons.forEach(button => {
+                button.addEventListener('click', async function() {
+                    const targetUrl = this.getAttribute('data-url');
+                    const resultDiv = this.nextElementSibling;
+                    const card = this.closest('.link-card');
+                    
+                    // 避免重复测速
+                    if (this.classList.contains('testing')) return;
+                    
+                    // 设置测速中状态
+                    this.classList.add('testing');
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>测速中';
+                    
+                    try {
+                        // 测试连接时间
+                        const connectTime = await testConnectionTime(targetUrl);
+                        
+                        // 显示结果
+                        if (connectTime === 'timeout' || connectTime >= 3000) {
+                            resultDiv.textContent = '超时';
+                            resultDiv.className = 'speed-result show speed-timeout';
+                        } else {
+                            resultDiv.textContent = connectTime + 'ms';
+                            resultDiv.classList.add('show');
+                            
+                            // 根据相对速度设置颜色
+                            if (connectTime < 200) {
+                                resultDiv.className = 'speed-result show speed-fast';
+                            } else if (connectTime < 500) {
+                                resultDiv.className = 'speed-result show speed-medium';
+                            } else {
+                                resultDiv.className = 'speed-result show speed-slow';
+                            }
+                            
+                            // 标记最快的卡片
+                            if (connectTime < fastestTime && connectTime < 3000) {
+                                // 移除之前的最快标记
+                                if (fastestCard) {
+                                    fastestCard.classList.remove('fastest');
+                                    const oldTitle = fastestCard.querySelector('.link-title');
+                                    if (oldTitle.querySelector('.speed-tag')) {
+                                        oldTitle.querySelector('.speed-tag').remove();
+                                    }
+                                }
+                                
+                                // 标记当前为最快
+                                fastestTime = connectTime;
+                                fastestCard = card;
+                                card.classList.add('fastest');
+                                
+                                // 添加"最快"标签
+                                const title = card.querySelector('.link-title');
+                                if (!title.querySelector('.speed-tag')) {
+                                    const fastTag = document.createElement('span');
+                                    fastTag.className = 'speed-tag fast';
+                                    fastTag.textContent = '最快';
+                                    title.appendChild(fastTag);
+                                }
+                            }
+                        }
+                        
+                        console.log(`连接测试: ${targetUrl} - ${connectTime}ms`);
+                        
+                    } catch (error) {
+                        // 测速失败
+                        resultDiv.textContent = '失败';
+                        resultDiv.className = 'speed-result show speed-timeout';
+                        resultDiv.classList.add('show');
+                        console.error('测速失败:', error);
+                    } finally {
+                        // 恢复按钮状态
+                        this.classList.remove('testing');
+                        this.innerHTML = '<i class="fas fa-tachometer-alt"></i>测速';
+                        
+                        // 10秒后隐藏结果
+                        setTimeout(() => {
+                            resultDiv.classList.remove('show');
+                        }, 10000);
+                    }
+                });
+            });
+        });
+        
+        // 测试网站连接时间
+        async function testConnectionTime(url) {
+            return new Promise((resolve) => {
+                const startTime = Date.now();
+                
+                // 使用Image对象测试连接时间
+                const img = new Image();
+                let timeoutId;
+                
+                img.onload = img.onerror = () => {
+                    clearTimeout(timeoutId);
+                    const endTime = Date.now();
+                    resolve(endTime - startTime);
+                };
+                
+                // 设置超时（3秒）
+                timeoutId = setTimeout(() => {
+                    img.onload = img.onerror = null;
+                    resolve('timeout');
+                }, 3000);
+                
+                // 尝试加载favicon
+                const testUrl = url.replace(/\/$/, '') + '/favicon.ico';
+                img.src = testUrl + '?t=' + Date.now();
+            });
+        }
+    </script>
+</body>
+</html>
